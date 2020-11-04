@@ -5,14 +5,16 @@
         </title>
         <link rel="stylesheet" href="/css/style.css" />
         <script type="text/javascript" src="https://kit.fontawesome.com/a076d05399.js"></script>
-
+        <meta name="viewport" content= "width=device-width, initial-scale=1.0"> 
     </head>
     <body>
+        <!-- Main panel boxes description and list details visualizer -->
         <div class="todolist-layout">
             <div class="task-main-box ">
                 <div class="task-add ">
                     <div class="desc-heading"><h5 style="margin-left: 5px;">DESCRIPTION</h5></div>
                     <div class="form">
+                    <!-- add description form -->
                     <form action="/create-task" method="POST">
                         <div class="form-inside">
                         <div><textarea name="description">Some text...</textarea></div>
@@ -28,6 +30,7 @@
                             <input type="date" name="duedate" id="dateofbirth">
                            </div>
                         </div>
+                        <!-- customized submit button -->
                         <div class="button-submit">
                             <button class="plus-button plus" style="background-color: blue;" type="submit">
                             <i class="fa fa-plus" aria-hidden="true" style="color:white;font-size: 2em;" ></i>
@@ -37,59 +40,89 @@
                     </form>
                     </div>
                 </div>
-                <div class="task-visualize">
-
-                </div>
-            </div>
-            <div class="update-notification">
-                <div class="upcoming">
-                    <%
-                let colorup;
-                switch(upcoming.tag){
-                    case "Work":
-                        colorup = "rgb(105, 192, 170)";
-                        break;
-                    case "Personal":
-                        colorup = "rgb(93, 93, 223)";
-                        break;
-                    case  "School":
-                        colorup = "purple";
-                        break;
-                    case "Other":
-                        colorup = "violet";
-                        break;
-                    }
-
-                %>
-                    <div class="upcoming-badge">
-                        <h3>UPCOMING</h3>
-                </div>
-                <div>
+                <div class="task-visualize " >
+                    <div class="task-header">LIST DETAILS</div>
+                    <div class="task-body">
                     <div>
-                        <h3><%= upcoming.description %></h3>
+                    <!-- pie chart color is assigned as per the list from locals through ejs     -->
+                    <div class="piechart"    style="background: conic-gradient( 
+                    rgb(105, 192, 170) 0 <%=chart.work%>%, 
+                    rgb(93, 93, 223) <%= chart.work%>% <%=chart.personal+chart.work%>%,
+                    purple <%=chart.personal+chart.work%>% <%=chart.personal+chart.work+chart.school%>%,  
+                    violet <%=chart.personal+chart.work+chart.school%>% <%=chart.personal+chart.work+chart.school+chart.other%>%)">
+                    </div>
+                    </div>
+                    <!-- percentage precision setting for display in visualizer -->
+                    <%
+                        let w = chart.work;
+                        w = w.toFixed(2);
+                        let s = chart.school;
+                        s = s.toFixed(2);
+                        let p = chart.personal;
+                        p = p.toFixed(2);
+                        let o = chart.other;
+                        o = o.toFixed(2);
+                    %>
+                    <div class="task-details">
+                        <ul>
+                            <li class="a">
+                              Work&nbsp;<span><%=`${w}`%>%</span> 
+                            </li>
+                            <li class="b">
+                              School&nbsp;<span><%=`${s}`%>%</span>
+                            </li>
+                            <li class="c">
+                              Personal&nbsp;<span><%=`${p}`%>%</span>
+                            </li>
+                            <li class="d">
+                              Others &nbsp;<span><%=`${o}`%>%</span>
+                            </li>    
+                        </ul>
+                    </div>
                     </div>
                 </div>
-                <div class="tag-img"    style="background-color: <%= `${colorup}`%>;">
-
-                    <div><h4><%= upcoming.tag %></h4></div>
-                </div>
             </div>
-            
-                <!-- <script type="text/javascript">
-                          let getvalue = ()=>
-                          {
-                            var checks = document.getElementsByName('checked');
-                            console.log(checks);
-                          } -->
-                <!-- </script> -->
-        <form action="/remove" method="POST">
+            <!-- upcoming layout section -->
+            <div class="update-notification">
+                <div class="upcoming">
+                    <!-- color tag for upcoming section -->
+                    <%
+                    let colorup;
+                    switch(upcoming.tag){
+                        case "Work":
+                            colorup = "rgb(105, 192, 170)";
+                            break;
+                        case "Personal":
+                            colorup = "rgb(93, 93, 223)";
+                            break;
+                        case  "School":
+                            colorup = "purple";
+                            break;
+                        case "Other":
+                            colorup = "violet";
+                            break;
+                        }
+                   %>
+                    <div class="upcoming-badge">
+                        <h3>UPCOMING</h3>
+                    </div>
+                    <div class="upcoming-des" style="  box-shadow: 0 4px 8px 0 <%= `${colorup}`%>;">
+                        <div>
+                            <h3><%= upcoming.description %></h3>
+                        </div>
+                    </div>
+                    <div class="tag-img"    style="background-color: <%= `${colorup}`%>;">
+                        <div><h4><%= upcoming.tag %></h4></div>
+                    </div>
+                </div>            
+            <form action="/remove" method="POST">
                 <div class="delete-button">
                     <button type="submit" class="trash-button"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
+            <!-- iterating over all list tasks from database and displaying it -->
             <% for(i of todolist) { %>
             <%
-                console.log(i.tag);
                 let color;
                 switch(i.tag){
                     case "Work":
@@ -105,18 +138,21 @@
                         color = "violet";
                         break;
                 }
+                var d= ""+ i.date;
+                
+                d = d.substr(0,15);
 
             %>
             <div class="tasks" style="border-left-color:<%= `${color}` %>" >
                 <div class="container">
                     <input type="checkbox"  name="<%= i.id %>" />
                 </div>
-                <div>
+                <div class="tasks-list">
                     <div>
                         <h3><%= i.description %></h3>
                     </div>
                     <div>
-                        <p><%= i.date %></p>
+                        <p><%= `${d}` %></p>
                     </div>
                 </div>
                 
@@ -128,6 +164,6 @@
             <% } %>
         </from>     
         </div>
-        <!-- <script type="text/javascript" src="/js/utility.js"></script> -->
+        <script type="text/javascript" src="/js/utility.js"></script>
     </body>
 </html>
